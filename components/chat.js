@@ -1,4 +1,4 @@
-import { React, Component } from 'react';
+import React, { Component } from 'react';
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 
 export default class ChatScreen extends Component {
@@ -9,11 +9,11 @@ export default class ChatScreen extends Component {
     render() {
         const backgroundColor = this.props.route.params.color;
         return (
-            <View style={[styles.chatContainer, { backgroundColor }]}>
+            <View style={[styles.container, { backgroundColor }]}>
                 <TouchableOpacity
-                    onPress={() => this.props.navigation.navigate("Chat")}
+                    onPress={() => this.props.navigation.navigate("StartScreen")}
                 >
-                    <Text style={{ color: "#FFF", fontSize: 24 }}>Start Chatting</Text>
+                    <Text style={{ color: "#FFF", fontSize: 24 }}>Go to Start</Text>
                 </TouchableOpacity>
             </View>
         )

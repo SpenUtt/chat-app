@@ -1,4 +1,4 @@
-import { useState, React } from 'react';
+import React, { Component } from 'react';
 import { 
     StyleSheet, 
     View, 
@@ -94,7 +94,7 @@ export default class StartScreen extends Component {
                             style={styles.button}
                             title="Enter Chat"
                             onPress={() =>
-                                this.props.navigation.navigate("Chat", {
+                                this.props.navigation.navigate("ChatScreen", {
                                     name: this.state.name,
                                     color: this.state.color,
                                 })
@@ -107,27 +107,6 @@ export default class StartScreen extends Component {
             </View>
         )
     }
-    
-    
-    /*const StartScreen = ({ navigation }) => {
-        const [name, setName] = useState('');
-
-        return (
-            <View style={styles.container}>
-                <Text>Chat Me Upp</Text>
-                <TextInput
-                    style={styles.textInput}
-                    value={name}
-                    onChangeText={setName}
-                    placeholder='Type your username here'
-                />
-                <Button
-                title="Enter Chat"
-                onPress={() => navigation.navigate('ChatScreen', { name: name})}
-                />
-            </View>
-        );
-    }*/
 }
    
 const styles = StyleSheet.create({
