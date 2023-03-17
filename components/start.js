@@ -33,7 +33,7 @@ export default class StartScreen extends Component {
                     style={styles.image}
                 >
                     <Text style={styles.title}>Chat.Me-Upp</Text>
-                    <KeyboardAvoidingView style={styles.box} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+                    <KeyboardAvoidingView style={styles.box} behavior={Platform.OS === "android" ? "padding" : "height"}>
                         <TextInput
                             style={[styles.input, styles.text]}
                             onChangeText={(name) => this.setState({ name })}
