@@ -7,7 +7,6 @@ import {
     ImageBackground,
     TouchableOpacity, 
     KeyboardAvoidingView,
-    SafeAreaView,
     Platform
 } from 'react-native';
 
@@ -27,13 +26,13 @@ export default class StartScreen extends Component {
     render () {
         const { black, purple, grey, green } = backgroundColors;
         return (
-            <SafeAreaView style ={{ flex: 1 }}>
+            <KeyboardAvoidingView style ={{ flex: 1 }}>
                 <ImageBackground
-                    source={require("../assets/Background-Image.png")}
+                    source={require("../assets/background-image.jpg")}
                     style={styles.image}
                 >
                     <Text style={styles.title}>Chat.Me-Upp</Text>
-                    <KeyboardAvoidingView style={styles.box} behavior={Platform.OS === "android" ? "padding" : "height"}>
+                    <View style={styles.container} behavior={Platform.OS === "android" ? "padding" : "height"}>
                         <TextInput
                             style={[styles.input, styles.text]}
                             onChangeText={(name) => this.setState({ name })}
@@ -105,9 +104,9 @@ export default class StartScreen extends Component {
                         >
                             <Text style={styles.buttonText}>Enter Chat</Text>
                         </TouchableOpacity>
-                    </KeyboardAvoidingView>
+                    </View>
                 </ImageBackground>
-            </SafeAreaView>
+            </KeyboardAvoidingView>
         )
     }
 }
