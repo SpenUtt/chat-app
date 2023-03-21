@@ -9,6 +9,7 @@ import {
     KeyboardAvoidingView,
     Platform
 } from 'react-native';
+import { getAuth, signInAnonymously } from "firebase/auth";
 
 const backgroundColors = {
     black: { backgroundColor: "#090C08" },
@@ -17,11 +18,23 @@ const backgroundColors = {
     green: { backgroundColor: "#B9C6AE" },
 };
 
-export default class StartScreen extends Component {
+export default function StartScreen(props) {
+    const auth = getAuth();
+    const signInUser = () => {
+        signInAnonymously(auth)
+        .then(result => {
+            navigation.navigate("ChatScreen", {userID: result.user.uid });
+            Alert.alert("Signed in Successfully!");
+        })
+        .catch((error) => {
+            Alert.alert("Unable to sign in, try later again.");
+        })
+    };
+
     constructor(props) {
         super(props);
         this.state = { name: "", color: "" };
-    }
+    };
 
     render () {
         const { black, purple, grey, green } = backgroundColors;
@@ -95,7 +108,7 @@ export default class StartScreen extends Component {
                         <TouchableOpacity 
                             style={styles.button}
                             title="Enter Chat"
-                            onPress={() =>
+                            onPress={(signInAnonymously) =>
                                 this.props.navigation.navigate("ChatScreen", {
                                     name: this.state.name,
                                     color: this.state.color,
@@ -108,7 +121,7 @@ export default class StartScreen extends Component {
                 </ImageBackground>
             </KeyboardAvoidingView>
         )
-    }
+    };
 }
    
 const styles = StyleSheet.create({

@@ -8,6 +8,25 @@ import {
 } from 'react-native';
 import { Bubble, GiftedChat } from "react-native-gifted-chat";
 
+const firebase = require("firebase/firestore");
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAX5tTVTSllo-vxBWjPVC_IFNmR2PLAv5k",
+    authDomain: "chat-app-a81ca.firebaseapp.com",
+    projectId: "chat-app-a81ca",
+    storageBucket: "chat-app-a81ca.appspot.com",
+    messagingSenderId: "785934217659",
+    appId: "1:785934217659:web:a2a6b90aef213d05f0549e",
+    measurementId: "G-CNEP5JYMJB"
+};
+
+// Initialize Firebase
+if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+
+// set firestore reference messages
+this.referenceChatMessages = firebase.firestore().collection("messages");
+
 const renderBubble = (props) => {
     return <Bubble
         {...props}
@@ -22,28 +41,43 @@ const renderBubble = (props) => {
     />
 }
 
-export default function Chat(props) {
+export default function ChatScreen(props) {
     const [messages, setMessages] = useState([]);
 
+    constructor() {
+        super();
+        this.state = {
+            messages: [],
+            uid: undefined,
+            user: {
+                _id: '',
+                avatar: '',
+                name: '',
+            },
+            loggedInText: 'loading...',
+            image: null,
+            location: null,
+            isConnected: false,
+        };
+    }
+
     useEffect(() => {
-        setMessages([
-            {
-                _id: 1,
-                text: "Hello developer",
-                createdAt: new Date(),
-                user: {
-                    _id: 2,
-                    name: "React Native",
-                    avatar: "https://placekitten.com/140/140",
-                },
-            },
-            {
-                _id: 2,
-                text: "You've entered the chat",
-                createdAt: new Date(),
-                system: true,
-            },
-        ]);
+        navigation.setOptions({ title: name });
+        const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+        const unsubMessages = onSnapshot(q, (docs) => {
+            let newMessages = [];
+            docs.forEach(doc => {
+                newMessages.push({
+                id: doc.id,
+                ...doc.data(),
+                createdAt: new Date(doc.data().createdAt.toMillis())
+                })
+            })
+            setMessages(newMessages);
+        })
+        return () => {
+            if (unsubMessages) unsubMessages();
+        }
     }, []);
     
     useEffect(() => {
@@ -58,8 +92,9 @@ export default function Chat(props) {
     }, [props.route.params.name, props.route.params.color]);
     
     const onSend = (newMessages = []) => {
-        setMessages(previousMessages => 
-            GiftedChat.append(previousMessages, newMessages))
+        addDoc(collection(db, "messages"), newMessages[0])
+        /*setMessages(previousMessages => 
+            GiftedChat.append(previousMessages, newMessages))*/
     }
 
     return (
@@ -71,7 +106,9 @@ export default function Chat(props) {
                 renderBubble={renderBubble}
                 onSend={messages => onSend(messages)}
                 user={{
-                    _id: 1
+                    _id: this.state.user._id,
+                    avatar: 'https://placekitten.com/140/140',
+                    name: name
                 }}
             />
             {Platform.OS === 'android' ? (
