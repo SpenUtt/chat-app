@@ -1,4 +1,3 @@
-import { getFirestore } from 'firebase/firestore';
 import React, { useState, useEffect } from 'react';
 import {  
     View, 
@@ -8,15 +7,13 @@ import {
     Platform 
 } from 'react-native';
 import { Bubble, GiftedChat } from "react-native-gifted-chat";
-
-const firebase = require("firebase/app");
 import {
     collection,
     query,
     orderBy,
     onSnapshot,
     addDoc,
-  } from "firebase/firestore";
+} from "firebase/firestore";
 
 const renderBubble = (props) => {
     return <Bubble
@@ -70,30 +67,30 @@ export default function ChatScreen({ navigation, route, db }) {
         };
         }, [navigation, route.params.name, route.params.color, db]);
     
-        // Function that adds a new message to the "messages" collection in Firestore when the user sends a message
-        const onSend = (newMessages) => {
-            addDoc(collection(db, "messages"), {
-                ...newMessages[0],
-                createdAt: new Date(),
-                user: {
-                _id: route.params.userID,
-                name: route.params.name,
-                },
-            });
-        };
+    // Function that adds a new message to the "messages" collection in Firestore when the user sends a message
+    const onSend = (newMessages) => {
+        addDoc(collection(db, "messages"), {
+            ...newMessages[0],
+            createdAt: new Date(),
+            user: {
+            _id: route.params.userID,
+            name: route.params.name,
+            },
+        });
+    };
   
     return (
         <View
-            style={[styles.container, { backgroundColor: props.route.params.color }]}
+            style={[styles.container, { backgroundColor: route.params.color }]}
         >
             <GiftedChat
                 messages={messages}
                 renderBubble={renderBubble}
                 onSend={messages => onSend(messages)}
                 user={{
-                    _id: this.state.user._id,
+                    _id: "state.user._id",
                     avatar: 'https://placekitten.com/140/140',
-                    name: name
+                    name: route.params.name,
                 }}
             />
             {Platform.OS === 'android' ? (

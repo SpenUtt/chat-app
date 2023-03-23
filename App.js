@@ -4,6 +4,8 @@ import StartScreen from './components/start';
 import ChatScreen from './components/chat';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
 
 const Stack = createNativeStackNavigator();
 
@@ -28,11 +30,11 @@ const App = () => {
           name="StartScreen"
           component={StartScreen}
         />
-        <Stack.Screen
-          name="ChatScreen">
-            component={ChatScreen}
-          {(props) => <Chat db={db} {...props}/>}
-        </Stack.Screen>
+          <Stack.Screen
+            name="ChatScreen"
+            >
+          {(props) => <ChatScreen db={db} {...props}/>} 
+          </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   )

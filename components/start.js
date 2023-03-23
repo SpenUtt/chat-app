@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
     StyleSheet, 
     View, 
@@ -10,6 +10,7 @@ import {
     Platform
 } from 'react-native';
 import { getAuth, signInAnonymously } from "firebase/auth";
+
 
 const backgroundColors = {
     black: { backgroundColor: "#090C08" },
@@ -29,7 +30,7 @@ const StartScreen = ({ navigation }) => {
             .then((userCredential) => {
                 const user = userCredential.user;
                 // Navigate to Chat screen with user's name, color, and ID
-                navigation.navigate("Chat", {
+                navigation.navigate("ChatScreen", {
                     name,
                     color: color || "#FFFFFF",
                     userID: user.uid,
@@ -40,6 +41,7 @@ const StartScreen = ({ navigation }) => {
                 Alert.alert("Unable to add. Please try later");
             });
     }
+
     return (
         <KeyboardAvoidingView style ={{ flex: 1 }}>
             <ImageBackground
@@ -111,7 +113,7 @@ const StartScreen = ({ navigation }) => {
                         <Text style={styles.colorLabel}>
                             Choose your Background Color:
                         </Text>
-                        <View style={styles.colorOptions}>{colorOptions}</View>
+                        
                     </View>
                     <TouchableOpacity 
                         style={styles.button} 
