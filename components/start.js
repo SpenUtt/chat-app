@@ -35,11 +35,11 @@ const StartScreen = ({ navigation }) => {
                     color: color || "#FFFFFF",
                     userID: user.uid,
                 });
-                Alert.alert("Signed in Successfully!");
+                //Alert.alert("Signed in Successfully!");
             })
-            .catch((error) => {
+            /*.catch((error) => {
                 Alert.alert("Unable to add. Please try later");
-            });
+            });*/
     }
 
     return (
