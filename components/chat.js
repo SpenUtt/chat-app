@@ -88,7 +88,7 @@ export default function ChatScreen({ navigation, route, db }) {
                 renderBubble={renderBubble}
                 onSend={messages => onSend(messages)}
                 user={{
-                    _id: "state.user._id",
+                    _id: route.params.userID,
                     avatar: 'https://placekitten.com/140/140',
                     name: route.params.name,
                 }}
@@ -98,7 +98,7 @@ export default function ChatScreen({ navigation, route, db }) {
             ) : null }
             <Button
                 title="Leave Chat"
-                onPress={() => props.navigation.navigate("StartScreen")}
+                onPress={() => navigation.navigate("StartScreen")}
             />
         </View>
     ) 

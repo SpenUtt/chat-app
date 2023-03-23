@@ -109,12 +109,6 @@ const StartScreen = ({ navigation }) => {
                             />
                         </View>
                     </View>
-                    <View style={styles.colorContainer}>
-                        <Text style={styles.colorLabel}>
-                            Choose your Background Color:
-                        </Text>
-                        
-                    </View>
                     <TouchableOpacity 
                         style={styles.button} 
                         onPress={handleSignIn}
