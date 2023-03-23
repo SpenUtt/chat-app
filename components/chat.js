@@ -1,3 +1,4 @@
+import { getFirestore } from 'firebase/firestore';
 import React, { useState, useEffect } from 'react';
 import {  
     View, 
@@ -8,24 +9,14 @@ import {
 } from 'react-native';
 import { Bubble, GiftedChat } from "react-native-gifted-chat";
 
-const firebase = require("firebase/firestore");
-
-const firebaseConfig = {
-    apiKey: "AIzaSyAX5tTVTSllo-vxBWjPVC_IFNmR2PLAv5k",
-    authDomain: "chat-app-a81ca.firebaseapp.com",
-    projectId: "chat-app-a81ca",
-    storageBucket: "chat-app-a81ca.appspot.com",
-    messagingSenderId: "785934217659",
-    appId: "1:785934217659:web:a2a6b90aef213d05f0549e",
-    measurementId: "G-CNEP5JYMJB"
-};
-
-// Initialize Firebase
-if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-
-
-// set firestore reference messages
-this.referenceChatMessages = firebase.firestore().collection("messages");
+const firebase = require("firebase/app");
+import {
+    collection,
+    query,
+    orderBy,
+    onSnapshot,
+    addDoc,
+  } from "firebase/firestore";
 
 const renderBubble = (props) => {
     return <Bubble
@@ -41,62 +32,56 @@ const renderBubble = (props) => {
     />
 }
 
-export default function ChatScreen(props) {
+export default function ChatScreen({ navigation, route, db }) {
     const [messages, setMessages] = useState([]);
-
-    constructor() {
-        super();
-        this.state = {
-            messages: [],
-            uid: undefined,
-            user: {
-                _id: '',
-                avatar: '',
-                name: '',
-            },
-            loggedInText: 'loading...',
-            image: null,
-            location: null,
-            isConnected: false,
-        };
-    }
-
+  
     useEffect(() => {
+        // Retrieve the name and color values from the navigation prop
+        let name = route.params.name;
+        let color = route.params.color;
+    
+        // Set the header title to the name value
         navigation.setOptions({ title: name });
-        const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
-        const unsubMessages = onSnapshot(q, (docs) => {
-            let newMessages = [];
-            docs.forEach(doc => {
-                newMessages.push({
-                id: doc.id,
-                ...doc.data(),
-                createdAt: new Date(doc.data().createdAt.toMillis())
-                })
-            })
-            setMessages(newMessages);
-        })
-        return () => {
-            if (unsubMessages) unsubMessages();
-        }
-    }, []);
     
-    useEffect(() => {
-        let name = props.route.params.name; 
-        let color = props.route.params.color;
-        props.navigation.setOptions({ title: name });
-        props.navigation.setOptions({
+        // Set the header background color to the color value
+        navigation.setOptions({
             headerStyle: {
-                backgroundColor: color,
-            }
-        })
-    }, [props.route.params.name, props.route.params.color]);
+            backgroundColor: color,
+            },
+        });
     
-    const onSend = (newMessages = []) => {
-        addDoc(collection(db, "messages"), newMessages[0])
-        /*setMessages(previousMessages => 
-            GiftedChat.append(previousMessages, newMessages))*/
-    }
-
+        // Listen for updates on the "messages" collection in real-time
+        const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            const fetchedMessages = [];
+            querySnapshot.forEach((doc) => {
+            const fetchedMessage = doc.data();
+            fetchedMessage.createdAt = new Date(
+                fetchedMessage.createdAt.seconds * 1000
+            );
+            fetchedMessages.push(fetchedMessage);
+            });
+            setMessages(fetchedMessages);
+        });
+    
+        // Clean up the listener
+        return () => {
+            unsubscribe();
+        };
+        }, [navigation, route.params.name, route.params.color, db]);
+    
+        // Function that adds a new message to the "messages" collection in Firestore when the user sends a message
+        const onSend = (newMessages) => {
+            addDoc(collection(db, "messages"), {
+                ...newMessages[0],
+                createdAt: new Date(),
+                user: {
+                _id: route.params.userID,
+                name: route.params.name,
+                },
+            });
+        };
+  
     return (
         <View
             style={[styles.container, { backgroundColor: props.route.params.color }]}
@@ -119,7 +104,7 @@ export default function ChatScreen(props) {
                 onPress={() => props.navigation.navigate("StartScreen")}
             />
         </View>
-    )
+    ) 
 }
 
 const styles = StyleSheet.create({
