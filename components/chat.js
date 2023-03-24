@@ -4,7 +4,7 @@ import {
     StyleSheet,
     Button,
     KeyboardAvoidingView,
-    Platform 
+    Platform, FlatList, Text, TextInput, TouchableOpacity, Alert 
 } from 'react-native';
 import { Bubble, GiftedChat } from "react-native-gifted-chat";
 import {
@@ -13,7 +13,10 @@ import {
     orderBy,
     onSnapshot,
     addDoc,
+    where 
 } from "firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { async } from '@firebase/util';
 
 const renderBubble = (props) => {
     return <Bubble
@@ -29,10 +32,18 @@ const renderBubble = (props) => {
     />
 }
 
+const renderInputToolbar = (props) => {
+    if (isConnected) return <InputToolbar {...props} />;
+    else return null;
+}
+
 export default function ChatScreen({ navigation, route, db }) {
+    let unsubscribe;
+    
     const [messages, setMessages] = useState([]);
   
     useEffect(() => {
+        if (isConnected === true) {    
         // Retrieve the name and color values from the navigation prop
         let name = route.params.name;
         let color = route.params.color;
@@ -47,27 +58,37 @@ export default function ChatScreen({ navigation, route, db }) {
             },
         });
     
-        // Listen for updates on the "messages" collection in real-time
-        const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            const fetchedMessages = [];
-            querySnapshot.forEach((doc) => {
-            const fetchedMessage = doc.data();
-            fetchedMessage.createdAt = new Date(
-                fetchedMessage.createdAt.seconds * 1000
-            );
-            fetchedMessages.push(fetchedMessage);
+        const q = query(collection(db, "messages"), where("uid", "==", userID));
+        const unsubscribe = onSnapshot(q, (documentSnapshot) => {
+            let fetchedMessages = [];
+            documentSnapshot.forEach(doc => {
+                newMessages.push({id: doc.id, ...doc.data () })
             });
+            cacheMessages(newMessages);
             setMessages(fetchedMessages);
         });
-    
+        } else loadCachedMessages();
+
         // Clean up the listener
         return () => {
-            unsubscribe();
+            if (unsubscribe) unsubscribe();
         };
-        }, [navigation, route.params.name, route.params.color, db]);
+        }, [isConnected]);
     
-    // Function that adds a new message to the "messages" collection in Firestore when the user sends a message
+    const loadCachedMessages = async () => {
+        const cachedMessages = await AsyncStorage.getItem("chat messages") || [];
+        setMessages(JSON.parse(cachedMessages));
+    }
+
+    const cacheMessages = async (messagesToCache) => {
+        try {
+            await AsyncStorage.setItem("chat messages", JSON.stringify(messagesToCache));
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
+    
+        // Function that adds a new message to the "messages" collection in Firestore when the user sends a message
     const onSend = (newMessages) => {
         addDoc(collection(db, "messages"), {
             ...newMessages[0],
@@ -86,6 +107,7 @@ export default function ChatScreen({ navigation, route, db }) {
             <GiftedChat
                 messages={messages}
                 renderBubble={renderBubble}
+                renderInputToolbar={renderInputToolbar}
                 onSend={messages => onSend(messages)}
                 user={{
                     _id: route.params.userID,
