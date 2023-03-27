@@ -6,7 +6,7 @@ import {
     KeyboardAvoidingView,
     Platform, FlatList, Text, TextInput, TouchableOpacity, Alert 
 } from 'react-native';
-import { Bubble, GiftedChat } from "react-native-gifted-chat";
+import { Bubble, GiftedChat, InputToolbar } from "react-native-gifted-chat";
 import {
     collection,
     query,
@@ -32,47 +32,49 @@ const renderBubble = (props) => {
     />
 }
 
-const renderInputToolbar = (props) => {
+const renderInputToolbar = (props, isConnected) => {
+    console.log("Props", props)
     if (isConnected) return <InputToolbar {...props} />;
     else return null;
 }
 
-export default function ChatScreen({ navigation, route, db }) {
-    let unsubscribe;
-    
+export default function ChatScreen({ navigation, route, db, isConnected }) {
     const [messages, setMessages] = useState([]);
+    let unsubscribe;
   
     useEffect(() => {
         if (isConnected === true) {    
-        // Retrieve the name and color values from the navigation prop
-        let name = route.params.name;
-        let color = route.params.color;
-    
-        // Set the header title to the name value
-        navigation.setOptions({ title: name });
-    
-        // Set the header background color to the color value
-        navigation.setOptions({
-            headerStyle: {
-            backgroundColor: color,
-            },
-        });
-    
-        const q = query(collection(db, "messages"), where("uid", "==", userID));
-        const unsubscribe = onSnapshot(q, (documentSnapshot) => {
-            let fetchedMessages = [];
-            documentSnapshot.forEach(doc => {
-                newMessages.push({id: doc.id, ...doc.data () })
+            // Retrieve the name and color values from the navigation prop
+            let name = route.params.name;
+            let color = route.params.color;
+        
+            // Set the header title to the name value
+            navigation.setOptions({ title: name });
+        
+            // Set the header background color to the color value
+            navigation.setOptions({
+                headerStyle: {
+                backgroundColor: color,
+                },
             });
-            cacheMessages(newMessages);
-            setMessages(fetchedMessages);
-        });
+        
+            const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+            unsubscribe = onSnapshot(q, (documentSnapshot) => {
+                let fetchedMessages = [];
+                documentSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const createdAt = new Date(data.createdAt.seconds * 1000); // Converting firebase timestamp to date
+                    fetchedMessages.push({id: doc.id, ...data, createdAt })
+                });
+                cacheMessages(fetchedMessages);
+                setMessages(fetchedMessages);
+            });
         } else loadCachedMessages();
 
-        // Clean up the listener
-        return () => {
-            if (unsubscribe) unsubscribe();
-        };
+            // Clean up the listener
+            return () => {
+                if (unsubscribe) unsubscribe();
+            };
         }, [isConnected]);
     
     const loadCachedMessages = async () => {
@@ -107,7 +109,7 @@ export default function ChatScreen({ navigation, route, db }) {
             <GiftedChat
                 messages={messages}
                 renderBubble={renderBubble}
-                renderInputToolbar={renderInputToolbar}
+                renderInputToolbar={(props) => renderInputToolbar(props, isConnected)}
                 onSend={messages => onSend(messages)}
                 user={{
                     _id: route.params.userID,

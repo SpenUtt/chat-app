@@ -1,5 +1,6 @@
+import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, Alert } from 'react-native';
 import StartScreen from './components/start';
 import ChatScreen from './components/chat';
 import { NavigationContainer } from '@react-navigation/native';
@@ -30,9 +31,9 @@ const App = () => {
   useEffect(() => {
     if (connectionStatus.isConnected === false) {
       Alert.alert("Connection Lost!");
-      disableNetwork(db);
+      //disableNetwork(db);
     } else if (connectionStatus.isConnected === true) {
-      enableNetwork(db);
+      //enableNetwork(db);
     }
   }, [connectionStatus.isConnected]);
 
