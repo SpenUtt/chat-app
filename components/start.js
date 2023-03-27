@@ -112,6 +112,9 @@ const StartScreen = ({ navigation }) => {
                     </View>
                     <TouchableOpacity 
                         style={styles.button} 
+                        accessible={true}
+                        accessibilityLabel="Start Chatting"
+                        accessibilityHint="Tap the button to navigate to chat room"
                         onPress={handleSignIn}
                         >
                         <Text style={styles.buttonText}>Start Chatting</Text>

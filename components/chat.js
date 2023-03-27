@@ -4,7 +4,7 @@ import {
     StyleSheet,
     Button,
     KeyboardAvoidingView,
-    Platform, FlatList, Text, TextInput, TouchableOpacity, Alert 
+    Platform 
 } from 'react-native';
 import { Bubble, GiftedChat, InputToolbar } from "react-native-gifted-chat";
 import {
@@ -12,11 +12,11 @@ import {
     query,
     orderBy,
     onSnapshot,
-    addDoc,
-    where 
+    addDoc
 } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { async } from '@firebase/util';
+import CustomActions from './CustomActions';
+import MapView from 'react-native-maps';
 
 const renderBubble = (props) => {
     return <Bubble
@@ -42,6 +42,31 @@ export default function ChatScreen({ navigation, route, db, isConnected }) {
     const [messages, setMessages] = useState([]);
     let unsubscribe;
   
+    const renderCustomActions = (props) => {
+        return <CustomActions userID={userID} storage={storage} {...props} />;
+    };
+
+    const renderCustomView = (props) => {
+        const { currentMessage } = props; 
+        if (currentMessage.location) {
+            return (
+                <MapView
+                    style={{width: 150,
+                        height: 100,
+                        borderRadius: 13,
+                        margin: 3}}
+                    region={{
+                        latitude: currentMessage.location.latitude,
+                        longitude: currentMessage.location.longitude,
+                        latitudeDelta: 0.0922,
+                        longitudeDelta: 0.0421,
+                    }}
+                />
+            )
+        }
+        return null;
+    }
+    
     useEffect(() => {
         if (isConnected === true) {    
             // Retrieve the name and color values from the navigation prop
@@ -110,6 +135,8 @@ export default function ChatScreen({ navigation, route, db, isConnected }) {
                 messages={messages}
                 renderBubble={renderBubble}
                 renderInputToolbar={(props) => renderInputToolbar(props, isConnected)}
+                renderActions={renderCustomActions}
+                renderCustomView={renderCustomView}
                 onSend={messages => onSend(messages)}
                 user={{
                     _id: route.params.userID,

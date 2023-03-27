@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, Button, Alert } from 'react-native';
+import React, { useEffect } from 'react';
+import { Alert } from 'react-native';
 import StartScreen from './components/start';
 import ChatScreen from './components/chat';
 import { NavigationContainer } from '@react-navigation/native';
@@ -8,6 +7,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { useNetInfo }from '@react-native-community/netinfo';
+import { getStorage } from "firebase/storage";
 
 
 const Stack = createNativeStackNavigator();
@@ -27,6 +27,7 @@ const App = () => {
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  const storage = getStorage(app);
 
   useEffect(() => {
     if (connectionStatus.isConnected === false) {
@@ -47,7 +48,7 @@ const App = () => {
           <Stack.Screen
             name="ChatScreen"
             >
-          {(props) => <ChatScreen isConnected={connectionStatus.isConnected} db={db} {...props}/>} 
+          {(props) => <ChatScreen isConnected={connectionStatus.isConnected} db={db} storage={storage} {...props}/>} 
           </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
