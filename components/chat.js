@@ -33,16 +33,15 @@ const renderBubble = (props) => {
 }
 
 const renderInputToolbar = (props, isConnected) => {
-    console.log("Props", props)
     if (isConnected) return <InputToolbar {...props} />;
     else return null;
 }
 
-export default function ChatScreen({ navigation, route, db, isConnected }) {
+export default function ChatScreen({ navigation, route, db, storage, isConnected }) {
     const [messages, setMessages] = useState([]);
     let unsubscribe;
   
-    const renderCustomActions = (props) => {
+    const renderCustomActions = (props, userID) => {
         return <CustomActions userID={userID} storage={storage} {...props} />;
     };
 
@@ -135,7 +134,7 @@ export default function ChatScreen({ navigation, route, db, isConnected }) {
                 messages={messages}
                 renderBubble={renderBubble}
                 renderInputToolbar={(props) => renderInputToolbar(props, isConnected)}
-                renderActions={renderCustomActions}
+                renderActions={(props) => renderCustomActions(props, route.params.userID)}
                 renderCustomView={renderCustomView}
                 onSend={messages => onSend(messages)}
                 user={{

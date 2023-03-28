@@ -144,6 +144,7 @@ const styles = StyleSheet.create({
         color: "#fff",
     },
     nameInput: {
+        width: "88%",
         fontSize: 16,
         fontWeight: "300",
         color: "#757083",

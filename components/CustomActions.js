@@ -91,7 +91,7 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, storage, onSend, userID })
             accessibilityHint={"Tap to share your location or send an image"}
         >
             <View  style={[styles.wrapper, wrapperStyle]}>
-                <Text style={[styles.iconText, iconTextStyle]}></Text>
+                <Text style={[styles.iconText, iconTextStyle]}>+</Text>
             </View>
         </TouchableOpacity>
     )
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     iconText: {
         color: '#b2b2b2',
         fontWeight: 'bold',
-        fontSize: 10,
+        fontSize: 15,
         backgroundColor: 'transparent',
         textAlign: 'center',
     }
